@@ -3,8 +3,6 @@ import requests
 import os
 
 # === Your Telegram details ===
-#TG_CHAT_ID = "1225164824"
-#TG_BOT_TOKEN = "8282035808:AAED2id4cHSMCo0cF_SXmGmgun-MnMoN3e0"
 
 app = Flask(__name__)
 
