@@ -7,20 +7,15 @@ app = Flask(__name__)
 # Load secrets from environment variables
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-API_KEY = os.getenv("API_KEY")
 
 @app.route('/alert', methods=['POST'])
 def receive_alert():
     """
-    Receives alerts from TradingView, validates the API key,
-    and sends a formatted message to a Telegram chat.
+    Receives alerts from TradingView and sends a formatted message to a Telegram chat.
+    This version does not include an API key for simplified testing.
     """
-    # 1. Security Check: Validate the API key from the request header
-    if request.headers.get('X-API-KEY') != API_KEY:
-        return jsonify({"status": "error", "message": "Invalid API Key"}), 401
-
     try:
-        # 2. Extract Data: Get the nested "data" dictionary from the payload
+        # 1. Extract Data: Get the nested "data" dictionary from the payload
         payload = request.json
         trade_data = payload.get("data", {})
         
@@ -30,7 +25,7 @@ def receive_alert():
         time = trade_data.get("time", "N/A")
         timeframe = trade_data.get("timeframe", "N/A")
         
-        # 3. Format Message for Telegram
+        # 2. Format Message for Telegram
         message = (
             f"🔔 TradingView Alert 🔔\n"
             f"---------------------------\n"
@@ -41,7 +36,7 @@ def receive_alert():
             f"⏱️ Timeframe: {timeframe}\n"
         )
         
-        # 4. Send the message to Telegram
+        # 3. Send the message to Telegram
         telegram_url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
         telegram_payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
         
@@ -54,7 +49,7 @@ def receive_alert():
             return jsonify({"status": "error", "message": "Failed to send message to Telegram"}), 500
 
     except Exception as e:
-        # 5. Error Handling: Catch any exceptions and return a helpful error message
+        # 4. Error Handling: Catch any exceptions and return a helpful error message
         return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/health', methods=['GET'])
